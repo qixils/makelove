@@ -158,11 +158,13 @@ def build_linux(config, version, target, target_directory, love_file_path):
     # Copy .love into AppDir
     if os.path.isfile(appdir("usr/bin/wrapper-love")):
         # pfirsich-style AppImages - > simply copy the love file into the image
-        print("Copying {} to {}".format(love_file_path, appdir("usr/bin")))
-        shutil.copy2(love_file_path, appdir("usr/bin"))
+        bindir = appdir("usr/bin")
+        print("Copying {} to {}".format(love_file_path, bindir))
+        shutil.copy2(love_file_path, bindir)
         desktop_exec = "wrapper-love %F"
     elif os.path.isfile(appdir("bin/love")):
         # Official AppImages (since 11.4) -> fuse the .love file to the love binary
+        bindir = appdir("bin")
         fused_exe_path = appdir(f"bin/{game_name}")
         print(
             "Fusing {} and {} into {}".format(
@@ -226,19 +228,8 @@ def build_linux(config, version, target, target_directory, love_file_path):
 
     # Shared libraries
     if target in config and "shared_libraries" in config[target]:
-        if os.path.isfile(appdir("usr/lib/liblove.so")):
-            # pfirsich-style AppImages
-            so_target_dir = appdir("usr/lib")
-        elif os.path.isfile(appdir("lib/liblove.so")):
-            # Official AppImages (since 11.4)
-            so_target_dir = appdir("lib/")
-        else:
-            sys.exit(
-                "Could not find liblove.so in AppDir. The AppImage has an unknown format."
-            )
-
         for f in config[target]["shared_libraries"]:
-            shutil.copy(f, so_target_dir)
+            shutil.copy(f, bindir)
 
     # Rebuild AppImage
     if should_build_artifact(config, target, "appimage", True):
