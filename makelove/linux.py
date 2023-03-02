@@ -157,6 +157,16 @@ def build_linux(config, version, target, target_directory, love_file_path):
 
     # Copy .love into AppDir
     if os.path.isfile(appdir("usr/bin/wrapper-love")):
+        # hack: override wrapper to fix bizarre upstream script
+        with open(appdir("usr/bin/wrapper-love"), "w") as f:
+            f.write("""#!/bin/sh
+cd "$APPDIR"
+love_files=$(find usr/bin -type f -name "*.love")
+if [ -z "$love_files" ]; then
+    usr/bin/love "$@"
+else
+    usr/bin/love --fused "$love_files" "$@"
+fi""")
         # pfirsich-style AppImages - > simply copy the love file into the image
         bindir = appdir("usr/bin")
         print("Copying {} to {}".format(love_file_path, bindir))
@@ -228,10 +238,8 @@ def build_linux(config, version, target, target_directory, love_file_path):
 
     # Shared libraries
     if target in config and "shared_libraries" in config[target]:
-        libdir = appdir("usr/lib/x86_64-linux-gnu/lua/5.1")
-        os.makedirs(libdir, exist_ok=True)
         for f in config[target]["shared_libraries"]:
-            shutil.copy(f, libdir)
+            shutil.copy(f, appdir_path)
 
     # Rebuild AppImage
     if should_build_artifact(config, target, "appimage", True):
