@@ -212,3 +212,7 @@ def build_macos(config, version, target, target_directory, love_file_path):
 
         loveZipKey = f"{config['name']}.app/Contents/Resources/{config['name']}.love"
         app_zip.writestr(loveZipKey, love_zip.read())
+
+        if target in config and "shared_libraries" in config[target]:
+            for f in config[target]["shared_libraries"]:
+                app_zip.write(f, f"{config['name']}.app/Contents/MacOS/{os.path.basename(f)}")

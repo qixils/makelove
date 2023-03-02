@@ -91,6 +91,7 @@ config_params = {
     "macos": val.Section(
         {
             "love_binaries": val.Path(),
+            "shared_libraries": val.List(val.Path()),
             "icon_file": val.Path(),
             "app_metadata": val.Dict(val.String(), val.String()),
         }
