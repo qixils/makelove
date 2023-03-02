@@ -229,7 +229,7 @@ def build_linux(config, version, target, target_directory, love_file_path):
     # Shared libraries
     if target in config and "shared_libraries" in config[target]:
         for f in config[target]["shared_libraries"]:
-            shutil.copy(f, appdir_path)
+            shutil.copy(f, appdir("usr/lib/x86_64-linux-gnu/lua/5.1"))
 
     # Rebuild AppImage
     if should_build_artifact(config, target, "appimage", True):
